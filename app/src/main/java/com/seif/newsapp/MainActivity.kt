@@ -2,6 +2,7 @@ package com.seif.newsapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.widget.Toast
 import kotlinx.android.synthetic.main.news_item.*
@@ -15,6 +16,12 @@ import java.lang.Exception
 const val BaseUrl = "https://api.currentsapi.services"
 
 class MainActivity : AppCompatActivity() {
+    lateinit var countDownTimer: CountDownTimer
+    private var titlelist = mutableListOf<String>()
+    private var descriptionlist = mutableListOf<String>()
+    private var imageslist = mutableListOf<String>()
+    private var linkslist = mutableListOf<String>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main1)
