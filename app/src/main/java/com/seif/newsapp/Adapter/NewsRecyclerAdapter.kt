@@ -39,7 +39,7 @@ class NewsRecyclerAdapter(private var title : List<String>,
         holder.itemView.txt_title.text = title[position]
         holder.itemView.txt_description.text = Discription[position]
 
-        Glide.with(holder.itemView)
+        Glide.with(holder.itemView.image_news)
             .load(images[position])
             .into(holder.itemView.image_news)
     }

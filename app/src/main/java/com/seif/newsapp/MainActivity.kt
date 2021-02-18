@@ -5,10 +5,14 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.seif.newsapp.Adapter.NewsRecyclerAdapter
+import kotlinx.android.synthetic.main.activity_main1.*
 import kotlinx.android.synthetic.main.news_item.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.Exception
@@ -26,10 +30,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main1)
 
-
         makeApiRequest()
 
-
+    }
+    private fun setUpRecyclerView(){
+        rec_news.layoutManager = LinearLayoutManager(this)
+        rec_news.adapter = NewsRecyclerAdapter(titlelist, descriptionlist, imageslist, linkslist)
+    }
+    private fun addToList(title:String, description:String, image:String, link:String){
+        titlelist.add(title)
+        descriptionlist.add(description)
+        imageslist.add(image)
+        linkslist.add(link)
     }
 
     private fun makeApiRequest() {
@@ -44,7 +56,12 @@ class MainActivity : AppCompatActivity() {
             try {
                 val response = api.getNews()
                 for (article in response.news){
-                    Log.d("main","data = $article")
+                    addToList(article.title, article.description, article.image, article.url)
+                }
+                // to update Ui
+                withContext(Dispatchers.Main){
+                    setUpRecyclerView()
+
                 }
             }
             catch (e:Exception){

@@ -26,10 +26,9 @@
 
             <ImageView
                 android:id="@+id/image_news"
-                tools:srcCompat="@tools:sample/avatars"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_launcher_foreground" />
+                android:src="@drawable/ic_launcher_background" />
 
             <TextView
                 android:id="@+id/txt_title"
