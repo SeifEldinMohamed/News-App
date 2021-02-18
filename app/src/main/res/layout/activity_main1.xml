@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="4dp"
     android:background="#292929"
     tools:context=".MainActivity">
 
@@ -12,6 +11,8 @@
         android:id="@+id/rec_news"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_margin="4dp"
+        android:background="#292929"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -29,7 +30,6 @@
         android:visibility="gone" />
 
     <ProgressBar
-        android:visibility="gone"
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"

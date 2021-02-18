@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.seif.newsapp.Adapter.NewsRecyclerAdapter
@@ -33,8 +34,14 @@ class MainActivity : AppCompatActivity() {
         makeApiRequest()
 
     }
+    private fun fadeInFromBlack(){
+        v_blackScreen.animate().apply {
+            alpha(0f)
+            duration = 3000
+        }.start()
+    }
     private fun setUpRecyclerView(){
-        rec_news.layoutManager = LinearLayoutManager(this)
+        rec_news.layoutManager = LinearLayoutManager(applicationContext)
         rec_news.adapter = NewsRecyclerAdapter(titlelist, descriptionlist, imageslist, linkslist)
     }
     private fun addToList(title:String, description:String, image:String, link:String){
@@ -45,6 +52,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun makeApiRequest() {
+        progressBar.visibility = View.VISIBLE
         val api = Retrofit.Builder()
             .baseUrl(BaseUrl) // take base url for the api
             .addConverterFactory(GsonConverterFactory.create())
@@ -56,18 +64,42 @@ class MainActivity : AppCompatActivity() {
             try {
                 val response = api.getNews()
                 for (article in response.news){
+                    Log.d("main",article.toString()+"\n")
                     addToList(article.title, article.description, article.image, article.url)
                 }
                 // to update Ui
                 withContext(Dispatchers.Main){
                     setUpRecyclerView()
+                    fadeInFromBlack()
+                    progressBar.visibility = View.GONE
 
                 }
             }
             catch (e:Exception){
-                Toast.makeText(this@MainActivity, "$e", Toast.LENGTH_SHORT).show()
+                withContext(Dispatchers.Main){
+                    attempRequestAgain()
+
+                }
             }
 
+
         }
+    }
+
+    private fun attempRequestAgain() {
+        countDownTimer = object : CountDownTimer(5000,1000){
+            override fun onTick(millisUntilFinished: Long) {
+                Log.d("main","coudn't retrieve data .... Trying again in ${millisUntilFinished/1000} seconds")
+
+            }
+
+            override fun onFinish() {
+                makeApiRequest()
+                // we have to cancel our countdowntimer as sometimes it will reset it
+                // only one request
+                countDownTimer.cancel()
+            }
+
+        }.start()
     }
 }
