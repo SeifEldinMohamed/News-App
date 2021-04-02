@@ -25,9 +25,9 @@ class NewsRecyclerAdapter(private var title : List<String>,
         init {
             itemview.cardView.setOnClickListener {
                 val position:Int = adapterPosition
-                val itent = Intent(Intent.ACTION_VIEW,
+                val intent = Intent(Intent.ACTION_VIEW,
                 Uri.parse(links[position]))
-                itemview.context.startActivity(itent)
+                itemview.context.startActivity(intent)
             }
         }
 

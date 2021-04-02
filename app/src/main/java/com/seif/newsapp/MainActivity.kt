@@ -18,8 +18,7 @@ import java.lang.Exception
 const val BaseUrl = "https://api.currentsapi.services"
 
 class MainActivity : AppCompatActivity() {
-    var parentjob: Job = Job()
-    lateinit var countDownTimer: CountDownTimer
+   private var parentJob: Job = Job()
     private var titlelist = mutableListOf<String>()
     private var descriptionlist = mutableListOf<String>()
     private var imageslist = mutableListOf<String>()
@@ -30,14 +29,15 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main1)
 
         makeApiRequest()
+
         swipeRefresh.setOnRefreshListener {
             makeApiRequest()
             swipeRefresh.isRefreshing = false
         }
-
     }
 
     private fun fadeInFromBlack() {
+        // show news in slow motion animation.
         v_blackScreen.animate().apply {
             alpha(0f)
             duration = 3000
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
             .create(ApiRequest::class.java) // takes the interface
 
         // we add the Dispatchers.Io to handle the information
-        parentjob = GlobalScope.launch(Dispatchers.IO) {
+        parentJob = GlobalScope.launch(Dispatchers.IO) {
             try {
                 val response = api.getNews()
                 for (article in response.news) {
@@ -97,7 +97,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         // to finish coroutine after activity closed
-        parentjob.cancel()
+        parentJob.cancel()
     }
 }
 // don't forget to show a text message to user when there is no internet
