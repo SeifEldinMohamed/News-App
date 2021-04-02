@@ -10,10 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.seif.newsapp.Adapter.NewsRecyclerAdapter
 import kotlinx.android.synthetic.main.activity_main1.*
 import kotlinx.android.synthetic.main.news_item.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.Exception
@@ -21,6 +18,7 @@ import java.lang.Exception
 const val BaseUrl = "https://api.currentsapi.services"
 
 class MainActivity : AppCompatActivity() {
+    var parentjob: Job = Job()
     lateinit var countDownTimer: CountDownTimer
     private var titlelist = mutableListOf<String>()
     private var descriptionlist = mutableListOf<String>()
@@ -32,19 +30,26 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main1)
 
         makeApiRequest()
+        swipeRefresh.setOnRefreshListener {
+            makeApiRequest()
+            swipeRefresh.isRefreshing = false
+        }
 
     }
-    private fun fadeInFromBlack(){
+
+    private fun fadeInFromBlack() {
         v_blackScreen.animate().apply {
             alpha(0f)
             duration = 3000
         }.start()
     }
-    private fun setUpRecyclerView(){
+
+    private fun setUpRecyclerView() {
         rec_news.layoutManager = LinearLayoutManager(applicationContext)
         rec_news.adapter = NewsRecyclerAdapter(titlelist, descriptionlist, imageslist, linkslist)
     }
-    private fun addToList(title:String, description:String, image:String, link:String){
+
+    private fun addToList(title: String, description: String, image: String, link: String) {
         titlelist.add(title)
         descriptionlist.add(description)
         imageslist.add(image)
@@ -60,46 +65,40 @@ class MainActivity : AppCompatActivity() {
             .create(ApiRequest::class.java) // takes the interface
 
         // we add the Dispatchers.Io to handle the information
-        GlobalScope.launch(Dispatchers.IO) {
+        parentjob = GlobalScope.launch(Dispatchers.IO) {
             try {
                 val response = api.getNews()
-                for (article in response.news){
-                    Log.d("main",article.toString()+"\n")
+                for (article in response.news) {
+                    Log.d("main", article.toString() + "\n")
                     addToList(article.title, article.description, article.image, article.url)
                 }
                 // to update Ui
-                withContext(Dispatchers.Main){
+                withContext(Dispatchers.Main) {
+                    mainContainer.visibility = View.VISIBLE
                     setUpRecyclerView()
+                    v_blackScreen.visibility = View.VISIBLE
                     fadeInFromBlack()
+                    progressBar.visibility = View.GONE
+                    txt_error.visibility = View.GONE
+
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    v_blackScreen.visibility = View.GONE
+                    mainContainer.visibility = View.GONE
+                    txt_error.visibility = View.VISIBLE
                     progressBar.visibility = View.GONE
 
                 }
             }
-            catch (e:Exception){
-                withContext(Dispatchers.Main){
-                    attempRequestAgain()
-
-                }
-            }
-
-
         }
     }
 
-    private fun attempRequestAgain() {
-        countDownTimer = object : CountDownTimer(5000,1000){
-            override fun onTick(millisUntilFinished: Long) {
-                Log.d("main","coudn't retrieve data .... Trying again in ${millisUntilFinished/1000} seconds")
-
-            }
-
-            override fun onFinish() {
-                makeApiRequest()
-                // we have to cancel our countdowntimer as sometimes it will reset it
-                // only one request
-                countDownTimer.cancel()
-            }
-
-        }.start()
+    override fun onStop() {
+        super.onStop()
+        // to finish coroutine after activity closed
+        parentjob.cancel()
     }
 }
+// don't forget to show a text message to user when there is no internet
+// or you can show a button to user to refresh the page
