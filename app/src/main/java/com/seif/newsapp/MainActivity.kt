@@ -100,5 +100,3 @@ class MainActivity : AppCompatActivity() {
         parentJob.cancel()
     }
 }
-// don't forget to show a text message to user when there is no internet
-// or you can show a button to user to refresh the page
