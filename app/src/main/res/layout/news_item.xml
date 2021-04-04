@@ -29,9 +29,9 @@
                 android:id="@+id/image_news"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:src="@drawable/ic_launcher_background"
-                android:contentDescription="@string/todo" />
+                android:layout_margin="6dp"
+                android:contentDescription="@string/todo"
+                android:src="@drawable/ic_launcher_background" />
 
             <TextView
                 android:id="@+id/txt_title"
